@@ -135,6 +135,16 @@ var _ = Describe("Application Reconciler", func() {
 			Expect(len(ns1List)).To(Equal(3))
 			Expect(componentKinds(ns1List)).To(ConsistOf("StatefulSet", "Deployment", "Service"))
 
+			selectorWithMatchExpressions := &metav1.LabelSelector{
+				MatchExpressions: []metav1.LabelSelectorRequirement{
+					{Key: "foo", Operator: "In", Values: []string{"bar"}},
+				},
+			}
+			ns1meList := applicationReconciler.fetchComponentListResources(ctx, groupKinds, selectorWithMatchExpressions, namespace1, &errs)
+			Expect(errs).To(BeNil())
+			Expect(len(ns1meList)).To(Equal(3))
+			Expect(componentKinds(ns1meList)).To(ConsistOf("StatefulSet", "Deployment", "Service"))
+
 			ns2l1List := applicationReconciler.fetchComponentListResources(ctx, groupKinds, metav1.SetAsLabelSelector(labelSet1), namespace2, &errs)
 			Expect(errs).To(BeNil())
 			Expect(len(ns2l1List)).To(Equal(2))
