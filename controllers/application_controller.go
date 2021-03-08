@@ -113,12 +113,18 @@ func (r *ApplicationReconciler) getNewApplicationStatus(ctx context.Context, app
 	return newApplicationStatus
 }
 
-func (r *ApplicationReconciler) fetchComponentListResources(ctx context.Context, groupKinds []metav1.GroupKind, selector *metav1.LabelSelector, namespace string, errs *[]error) []*unstructured.Unstructured {
+func (r *ApplicationReconciler) fetchComponentListResources(ctx context.Context, groupKinds []metav1.GroupKind, labelSelector *metav1.LabelSelector, namespace string, errs *[]error) []*unstructured.Unstructured {
 	logger := getLoggerOrDie(ctx)
 	var resources []*unstructured.Unstructured
 
-	if selector == nil {
+	if labelSelector == nil {
 		logger.Info("No selector is specified")
+		return resources
+	}
+
+	selector, err := metav1.LabelSelectorAsSelector(labelSelector)
+	if err != nil {
+		*errs = append(*errs, err)
 		return resources
 	}
 
@@ -134,7 +140,7 @@ func (r *ApplicationReconciler) fetchComponentListResources(ctx context.Context,
 
 		list := &unstructured.UnstructuredList{}
 		list.SetGroupVersionKind(mapping.GroupVersionKind)
-		if err = r.Client.List(ctx, list, client.InNamespace(namespace), client.MatchingLabels(selector.MatchLabels)); err != nil {
+		if err = r.Client.List(ctx, list, client.InNamespace(namespace), client.MatchingLabelsSelector{Selector: selector}); err != nil {
 			logger.Error(err, "unable to list resources for GVK", "gvk", mapping.GroupVersionKind)
 			*errs = append(*errs, err)
 			continue
