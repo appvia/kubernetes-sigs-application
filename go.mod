@@ -11,7 +11,7 @@ require (
 	github.com/pkg/errors v0.8.1
 	go.uber.org/atomic v1.4.0 // indirect
 	golang.org/x/crypto v0.0.0-20190911031432-227b76d455e7 // indirect
-	golang.org/x/sys v0.0.0-20191105231009-c1f44814a5cd // indirect
+	golang.org/x/sys v0.1.0 // indirect
 	gopkg.in/yaml.v2 v2.2.5 // indirect
 	k8s.io/api v0.17.0
 	k8s.io/apiextensions-apiserver v0.17.0
